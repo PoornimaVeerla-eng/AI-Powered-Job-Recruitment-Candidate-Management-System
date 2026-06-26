@@ -1,36 +1,26 @@
-Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/README.md --file-text "# 01 — Requirements & Scope
+You're right! I created only `README.md` files, but originally promised separate `.md` files inside each folder. Let me fix that now by creating the exact structure you mentioned.
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/Business-Requirements.md --file-text "# Business Requirements
 
-GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/tree/main/01-Requirements`
-
----
-
-## Business Requirements
-
-The HR/Recruitment team needs a centralized Salesforce system to:
-
-1. Post and manage job openings.
-2. Maintain a candidate database with resumes & skills.
-3. Track applications, interviews, and offers.
-4. Automate candidate-job matching using AI (Agentforce).
-5. Send automated email alerts to candidates and recruiters.
-6. Enforce data integrity and approval workflows for offer letters.
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/01-Requirements/Business-Requirements.md`
 
 ---
 
-## Project Scope
+## Overview
 
-### In Scope
-- Custom Salesforce objects: Job, Candidate, Application, Interview, Offer
-- Validation rules, approval processes, flows
-- Agentforce AI agent for resume screening
-- Lightning App with custom UI
-- Role-based security
-- Email automation
+The HR/Recruitment team needs a centralized Salesforce system to manage the end-to-end recruitment lifecycle, powered by AI for intelligent candidate matching.
 
-### Out of Scope
-- External job board integration (LinkedIn/Indeed scraping)
-- Payroll module
-- Mobile app (Phase 2)
+---
+
+## Core Business Needs
+
+1. **Job Management** — Post and manage job openings with full lifecycle (Draft → Open → Closed).
+2. **Candidate Database** — Maintain a searchable candidate database with resumes, skills, and experience.
+3. **Application Tracking (ATS)** — Track every application from submission to hiring decision.
+4. **Interview Coordination** — Schedule, conduct, and record interview feedback across multiple rounds.
+5. **AI-Powered Screening** — Use Agentforce to auto-score candidates against job requirements.
+6. **Offer Management** — Automated approval workflows for offer letters above defined thresholds.
+7. **Email Automation** — Auto-send updates to candidates, recruiters, and managers.
+8. **Reporting & Analytics** — Dashboards for time-to-hire, conversion rate, source effectiveness.
 
 ---
 
@@ -40,7 +30,7 @@ The HR/Recruitment team needs a centralized Salesforce system to:
 |------|----------------|
 | HR Manager | Approves job postings & offers |
 | Recruiter | Manages candidates & interviews |
-| Interviewer | Submits feedback |
+| Interviewer | Submits interview feedback |
 | Candidate (external) | Applies to jobs |
 
 ---
@@ -50,134 +40,106 @@ The HR/Recruitment team needs a centralized Salesforce system to:
 - 50% reduction in time-to-hire
 - 80% accuracy in AI candidate matching
 - 100% offer approval traceability
+- 30% improvement in recruiter productivity
 "
-Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/README.md
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/Business-Requirements.md
 
 
-Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/README.md --file-text "# 02 — Objects Creation
 
-GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/tree/main/02-Objects`
 
----
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/Project-Scope.md --file-text "# Project Scope
 
-## Custom Objects
-
-### 1. Job__c
-**Label:** Job  
-**Plural:** Jobs  
-**Record Name:** Job Number (Auto Number, `JOB-{0000}`)
-
-### 2. Candidate__c
-**Label:** Candidate  
-**Plural:** Candidates  
-**Record Name:** Candidate Name (Text)
-
-### 3. Application__c
-**Label:** Application  
-**Plural:** Applications  
-**Record Name:** Application Number (Auto Number, `APP-{0000}`)
-
-### 4. Interview__c
-**Label:** Interview  
-**Plural:** Interviews  
-**Record Name:** Interview Number (Auto Number, `INT-{0000}`)
-
-### 5. Offer__c
-**Label:** Offer  
-**Plural:** Offers  
-**Record Name:** Offer Number (Auto Number, `OFF-{0000}`)
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/01-Requirements/Project-Scope.md`
 
 ---
 
-## Metadata XML
+## In Scope
 
-### Job__c.object-meta.xml
-```xml
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-    <label>Job</label>
-    <pluralLabel>Jobs</pluralLabel>
-    <nameField>
-        <displayFormat>JOB-{0000}</displayFormat>
-        <label>Job Number</label>
-        <type>AutoNumber</type>
-    </nameField>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <sharingModel>ReadWrite</sharingModel>
-    <enableActivities>true</enableActivities>
-    <enableReports>true</enableReports>
-    <enableSearch>true</enableSearch>
-</CustomObject>
-```
+### Custom Objects
+- `Job__c` — Job postings
+- `Candidate__c` — Candidate database
+- `Application__c` — Junction object for applications
+- `Interview__c` — Interview records
+- `Offer__c` — Offer letters
 
-### Candidate__c.object-meta.xml
-```xml
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-    <label>Candidate</label>
-    <pluralLabel>Candidates</pluralLabel>
-    <nameField>
-        <label>Candidate Name</label>
-        <type>Text</type>
-    </nameField>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <sharingModel>ReadWrite</sharingModel>
-    <enableActivities>true</enableActivities>
-    <enableReports>true</enableReports>
-</CustomObject>
-```
+### Salesforce Configuration
+- Validation rules for data integrity
+- Approval process for offer letters
+- Record-triggered flows for automation
+- Email templates & alerts
+- Custom page layouts & dynamic forms
+- Lightning App (\"Recruitment Hub\")
 
-### Application__c.object-meta.xml
-```xml
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-    <label>Application</label>
-    <pluralLabel>Applications</pluralLabel>
-    <nameField>
-        <displayFormat>APP-{0000}</displayFormat>
-        <label>Application Number</label>
-        <type>AutoNumber</type>
-    </nameField>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <sharingModel>ReadWrite</sharingModel>
-</CustomObject>
-```
+### AI / Custom Code
+- Agentforce AI agent for candidate scoring
+- Apex classes for AI integration
+- Custom LWC for AI match visualization
 
-### Interview__c.object-meta.xml
-```xml
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-    <label>Interview</label>
-    <pluralLabel>Interviews</pluralLabel>
-    <nameField>
-        <displayFormat>INT-{0000}</displayFormat>
-        <label>Interview Number</label>
-        <type>AutoNumber</type>
-    </nameField>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <sharingModel>ReadWrite</sharingModel>
-</CustomObject>
-```
+### Security
+- 3 Profiles (Recruiter, HR Manager, Interviewer)
+- Role hierarchy
+- Duplicate & matching rules
+- Permission sets
 
-### Offer__c.object-meta.xml
-```xml
-<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-    <label>Offer</label>
-    <pluralLabel>Offers</pluralLabel>
-    <nameField>
-        <displayFormat>OFF-{0000}</displayFormat>
-        <label>Offer Number</label>
-        <type>AutoNumber</type>
-    </nameField>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <sharingModel>ReadWrite</sharingModel>
-</CustomObject>
-```
+### Deployment
+- SFDX project setup
+- GitHub Actions CI/CD pipeline
+- UAT test cases
 
 ---
 
-## Setup Path (Salesforce UI)
-**Setup → Object Manager → Create → Custom Object**
+## Out of Scope
+
+- External job board integration (LinkedIn, Indeed, Naukri)
+- Payroll module
+- Native mobile app (Phase 2)
+- Background verification integration
+- E-signature for offer letters
+- Multi-language support
+- Video interview platform integration
+
+---
+
+## Assumptions
+
+- Salesforce Enterprise/Unlimited Edition with Einstein/Agentforce licenses
+- Internet access for AI callouts
+- Email deliverability is configured at org level
+- All users have valid Salesforce licenses
+
+---
+
+## Constraints
+
+- Apex governor limits (CPU time, callouts)
+- Agentforce API rate limits
+- Daily email send limit (5,000 per org for Standard)
+
+---
+
+## Deliverables
+
+| # | Deliverable |
+|---|-------------|
+| 1 | Configured Salesforce org with all custom objects |
+| 2 | Working Agentforce AI agent |
+| 3 | Lightning App with full UI |
+| 4 | User documentation |
+| 5 | Deployment scripts & CI/CD pipeline |
+| 6 | UAT sign-off |
+
+---
+
+## Timeline (Indicative)
+
+| Phase | Duration |
+|-------|----------|
+| Planning | 1 week |
+| Backend Build | 3 weeks |
+| AI Integration | 2 weeks |
+| UI/UX | 2 weeks |
+| Security & Testing | 1 week |
+| Deployment & UAT | 1 week |
+| **Total** | **10 weeks** |
 "
-Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/README.md
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/Project-Scope.md
