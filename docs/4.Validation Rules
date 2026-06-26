@@ -1,1 +1,102 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/04-Validation-Rules/Validation-Rules.md --file-text "# Validation Rules
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/04-Validation-Rules/Validation-Rules.md`
+
+---
+
+## VR1 — Salary Range Check (Job__c)
+
+**Purpose:** Ensure Max Salary >= Min Salary.
+
+**Formula:**
+```
+AND(
+    NOT(ISBLANK(Min_Salary__c)),
+    NOT(ISBLANK(Max_Salary__c)),
+    Max_Salary__c < Min_Salary__c
+)
+```
+**Error Message:** `Maximum Salary must be greater than or equal to Minimum Salary.`
+
+### Metadata XML
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<ValidationRule xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Salary_Range_Check</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(NOT(ISBLANK(Min_Salary__c)), NOT(ISBLANK(Max_Salary__c)), Max_Salary__c &lt; Min_Salary__c)</errorConditionFormula>
+    <errorMessage>Maximum Salary must be greater than or equal to Minimum Salary.</errorMessage>
+</ValidationRule>
+```
+
+---
+
+## VR2 — Valid Email Format (Candidate__c)
+
+**Formula:**
+```
+NOT(REGEX(Email__c, \"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\"))
+```
+**Error Message:** `Please enter a valid email address.`
+
+---
+
+## VR3 — Experience Non-Negative (Candidate__c)
+
+**Formula:**
+```
+Experience_Years__c < 0
+```
+**Error Message:** `Experience cannot be negative.`
+
+---
+
+## VR4 — Interview Date in Future (Interview__c)
+
+**Formula:**
+```
+AND(
+    NOT(ISBLANK(Interview_Date__c)),
+    Interview_Date__c < NOW()
+)
+```
+**Error Message:** `Interview Date must be in the future.`
+
+---
+
+## VR5 — Offered Salary within Job Range (Offer__c)
+
+**Formula:**
+```
+OR(
+    Offered_Salary__c < Application__r.Job__r.Min_Salary__c,
+    Offered_Salary__c > Application__r.Job__r.Max_Salary__c
+)
+```
+**Error Message:** `Offered salary must be within the job's salary range.`
+
+---
+
+## VR6 — Application Status Transition (Application__c)
+
+**Purpose:** Prevent reverting Hired/Rejected applications.
+
+**Formula:**
+```
+AND(
+    OR(
+        ISPICKVAL(PRIORVALUE(Application_Status__c), \"Hired\"),
+        ISPICKVAL(PRIORVALUE(Application_Status__c), \"Rejected\")
+    ),
+    NOT(ISPICKVAL(Application_Status__c, TEXT(PRIORVALUE(Application_Status__c))))
+)
+```
+**Error Message:** `Cannot change status once application is Hired or Rejected.`
+
+---
+
+## Setup Path
+**Setup → Object Manager → [Object] → Validation Rules → New**
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/04-Validation-Rules/Validation-Rules.md
