@@ -1,1 +1,227 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/09-Security/Roles-Hierarchy.md --file-text "# Roles Hierarchy
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/09-Security/Roles-Hierarchy.md`
+
+---
+
+## Role Hierarchy
+
+```
+CEO
+ └─ VP HR
+     └─ HR Manager
+         ├─ Senior Recruiter
+         │   └─ Recruiter
+         └─ Interview Panel Lead
+             └─ Interviewer
+```
+
+---
+
+## Roles Table
+
+| Role | Parent | Access |
+|------|--------|--------|
+| CEO | — | All records |
+| VP HR | CEO | All HR records |
+| HR Manager | VP HR | All recruitment records |
+| Senior Recruiter | HR Manager | Team's records |
+| Recruiter | Senior Recruiter | Own records |
+| Interview Panel Lead | HR Manager | Team interview records |
+| Interviewer | Interview Panel Lead | Assigned interviews |
+
+---
+
+## HR_Manager.role-meta.xml
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Role xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <name>HR Manager</name>
+    <parentRole>VP_HR</parentRole>
+    <mayForecastManagerShare>false</mayForecastManagerShare>
+    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+</Role>
+```
+
+---
+
+## VP_HR.role-meta.xml
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Role xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <name>VP HR</name>
+    <parentRole>CEO</parentRole>
+    <mayForecastManagerShare>true</mayForecastManagerShare>
+    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+</Role>
+```
+
+---
+
+## Recruiter.role-meta.xml
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Role xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <name>Recruiter</name>
+    <parentRole>Senior_Recruiter</parentRole>
+    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+</Role>
+```
+
+---
+
+## Org-Wide Defaults (OWD)
+
+| Object | Internal Access |
+|--------|-----------------|
+| Job__c | Public Read/Write |
+| Candidate__c | Private |
+| Application__c | Controlled by Parent |
+| Interview__c | Controlled by Parent |
+| Offer__c | Private |
+
+---
+
+## Sharing Rules
+
+### Candidate Sharing Rule
+- **Name:** Share Candidates with HR Team
+- **Type:** Criteria-based
+- **Criteria:** `Created_By.Department = 'HR'`
+- **Share With:** Public Group \"HR Team\"
+- **Access:** Read/Write
+
+### Offer Sharing Rule
+- **Name:** Share Offers with HR Manager
+- **Criteria:** `Status__c = 'Pending'`
+- **Share With:** Role \"HR Manager\"
+- **Access:** Read/Write
+
+---
+
+## Setup Path
+**Setup → Users → Roles → Set Up Roles**
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/09-Security/Duplicate-Rules.md --file-text "# Duplicate Rules
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/09-Security/Duplicate-Rules.md`
+
+---
+
+## Matching Rule — Candidate Email Match
+
+**Object:** Candidate__c  
+**Match Criteria:** `Email__c` (Exact match)
+
+### Metadata XML
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<MatchingRule xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Candidate_Email_Match</fullName>
+    <booleanFilter>1</booleanFilter>
+    <description>Match candidates by email</description>
+    <label>Candidate Email Match</label>
+    <matchingRuleItems>
+        <fieldName>Email__c</fieldName>
+        <matchingMethod>Exact</matchingMethod>
+    </matchingRuleItems>
+    <ruleStatus>Active</ruleStatus>
+</MatchingRule>
+```
+
+---
+
+## Matching Rule — Candidate Phone Match (Fuzzy)
+
+**Object:** Candidate__c  
+**Match Criteria:** `Phone__c` (Fuzzy match)
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<MatchingRule xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Candidate_Phone_Match</fullName>
+    <label>Candidate Phone Match</label>
+    <matchingRuleItems>
+        <fieldName>Phone__c</fieldName>
+        <matchingMethod>Exact</matchingMethod>
+    </matchingRuleItems>
+    <ruleStatus>Active</ruleStatus>
+</MatchingRule>
+```
+
+---
+
+## Duplicate Rule — Block Duplicate Candidates
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<DuplicateRule xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Block_Duplicate_Candidates</fullName>
+    <actionOnInsert>Block</actionOnInsert>
+    <actionOnUpdate>Block</actionOnUpdate>
+    <alertText>A candidate with this email already exists.</alertText>
+    <duplicateRuleMatchRules>
+        <matchingRule>Candidate_Email_Match</matchingRule>
+        <objectMapping>
+            <inputObject>Candidate__c</inputObject>
+            <outputObject>Candidate__c</outputObject>
+        </objectMapping>
+    </duplicateRuleMatchRules>
+    <isActive>true</isActive>
+    <masterLabel>Block Duplicate Candidates</masterLabel>
+    <operationsOnInsert>Alert</operationsOnInsert>
+    <operationsOnUpdate>Alert</operationsOnUpdate>
+</DuplicateRule>
+```
+
+---
+
+## Duplicate Rule — Warn on Duplicate Application
+
+**Purpose:** If same Candidate applies to same Job twice, warn user.
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<DuplicateRule xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Warn_Duplicate_Application</fullName>
+    <actionOnInsert>Allow</actionOnInsert>
+    <actionOnUpdate>Allow</actionOnUpdate>
+    <alertText>This candidate has already applied to this job.</alertText>
+    <isActive>true</isActive>
+    <masterLabel>Warn Duplicate Application</masterLabel>
+    <operationsOnInsert>Alert</operationsOnInsert>
+    <operationsOnUpdate>Alert</operationsOnUpdate>
+</DuplicateRule>
+```
+
+---
+
+## Test Scenarios
+
+| # | Action | Expected |
+|---|--------|----------|
+| 1 | Create candidate with email `a@b.com` | Saved |
+| 2 | Create another candidate with same email | Blocked with alert |
+| 3 | Create candidate with similar phone | Alert shown |
+| 4 | Same candidate applies to same job twice | Warning, allows save |
+
+---
+
+## Setup Path
+**Setup → Data → Duplicate Management → Matching Rules → New**  
+Then **Duplicate Rules → New** (referencing the matching rule).
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/09-Security/Duplicate-Rules.md
+
+
+
+
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/09-Security/Roles-Hierarchy.md
