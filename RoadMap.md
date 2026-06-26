@@ -15,7 +15,7 @@ This is the master roadmap with **10 condensed milestones** covering the full pr
 | 4 | Validation Rules | Backend | [04-Validation-Rules](./04-Validation-Rules) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/04-Validation-Rules` |
 | 5 | Approval Process | Backend | [05-Approval-Process](./05-Approval-Process) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/05-Approval-Process` |
 | 6 | Flows + Email Automation | Backend | [06-Flows-and-Email](./06-Flows-and-Email) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/06-Flows-and-Email` |
-| 7 | Agentforce AI ⭐ | AI Layer | [07-Agentforce-AI](./07-Agentforce-AI) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/07-Agentforce-AI` |
+| 7 | Agentforce AI  | AI Layer | [07-Agentforce-AI](./07-Agentforce-AI) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/07-Agentforce-AI` |
 | 8 | Lightning App + Layouts + Dynamic Forms | UI/UX | [08-Lightning-App-UI](./08-Lightning-App-UI) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/08-Lightning-App-UI` |
 | 9 | Profiles + Roles + Duplicate Rules | Security | [09-Security](./09-Security) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/09-Security` |
 | 10 | Deployment + Documentation + UAT | Go-Live | [10-Deployment](./10-Deployment) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/10-Deployment` |
