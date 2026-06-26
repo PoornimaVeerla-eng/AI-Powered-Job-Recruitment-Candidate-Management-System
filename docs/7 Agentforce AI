@@ -1,1 +1,208 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/07-Agentforce-AI/AI-Configuration.md --file-text "# AI Configuration — Agentforce
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/07-Agentforce-AI/AI-Configuration.md`
+
+---
+
+## Overview
+
+Agentforce AI agent that:
+1. Reads a candidate's resume/skills.
+2. Compares against open job requirements.
+3. Generates an **AI Match Score (0-100)** and recommendation summary.
+4. Updates `Candidate__c.AI_Match_Score__c` and `Application__c.AI_Recommendation__c`.
+
+---
+
+## Agentforce Agent Setup
+
+**Agent Name:** `RecruitmentAgent`  
+**Type:** Service Agent (Einstein GPT)  
+**Topic:** Candidate Screening
+
+### Prompt Instructions
+```
+You are an expert recruitment assistant. Compare the candidate's skills and experience against the job's required skills.
+
+Inputs:
+- Candidate Skills: {!Candidate__c.Skills__c}
+- Candidate Experience (Years): {!Candidate__c.Experience_Years__c}
+- Job Required Skills: {!Job__c.Required_Skills__c}
+- Job Description: {!Job__c.Job_Description__c}
+
+Output a JSON object:
+{
+  \"match_score\": <integer 0-100>,
+  \"recommendation\": \"<2-3 sentence reasoning>\",
+  \"matched_skills\": [...],
+  \"missing_skills\": [...]
+}
+```
+
+---
+
+## Apex Class — AICandidateMatcher.cls
+
+```apex
+public with sharing class AICandidateMatcher {
+
+    @InvocableMethod(label='Calculate AI Match Score' description='Calls Agentforce/Einstein to score candidate vs job')
+    public static List<MatchResult> calculateScore(List<MatchRequest> requests) {
+        List<MatchResult> results = new List<MatchResult>();
+        for (MatchRequest req : requests) {
+            MatchResult res = new MatchResult();
+            try {
+                String prompt = buildPrompt(req);
+                String response = AgentforceService.callAgent('RecruitmentAgent', prompt);
+                Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(response);
+                res.matchScore = (Integer) parsed.get('match_score');
+                res.recommendation = (String) parsed.get('recommendation');
+            } catch (Exception e) {
+                res.matchScore = 0;
+                res.recommendation = 'Error: ' + e.getMessage();
+            }
+            results.add(res);
+        }
+        return results;
+    }
+
+    private static String buildPrompt(MatchRequest req) {
+        return 'Candidate Skills: ' + req.candidateSkills +
+               '\nCandidate Experience: ' + req.candidateExperience +
+               '\nJob Required Skills: ' + req.jobRequiredSkills +
+               '\nJob Description: ' + req.jobDescription;
+    }
+
+    public class MatchRequest {
+        @InvocableVariable(required=true) public String candidateSkills;
+        @InvocableVariable(required=true) public Integer candidateExperience;
+        @InvocableVariable(required=true) public String jobRequiredSkills;
+        @InvocableVariable public String jobDescription;
+    }
+
+    public class MatchResult {
+        @InvocableVariable public Integer matchScore;
+        @InvocableVariable public String recommendation;
+    }
+}
+```
+
+---
+
+## Apex Class — AgentforceService.cls (HTTP wrapper)
+
+```apex
+public with sharing class AgentforceService {
+
+    private static final String AGENT_ENDPOINT = 'callout:Agentforce_API/agents/invoke';
+
+    public static String callAgent(String agentName, String prompt) {
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(AGENT_ENDPOINT);
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/json');
+        req.setBody(JSON.serialize(new Map<String, Object>{
+            'agent' => agentName,
+            'input' => prompt
+        }));
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+        if (res.getStatusCode() == 200) {
+            return res.getBody();
+        }
+        throw new CalloutException('Agentforce call failed: ' + res.getStatus());
+    }
+}
+```
+
+---
+
+## Apex Trigger — ApplicationTrigger.trigger
+
+```apex
+trigger ApplicationTrigger on Application__c (after insert) {
+    List<Application__c> toUpdate = new List<Application__c>();
+    Set<Id> candidateIds = new Set<Id>();
+    Set<Id> jobIds = new Set<Id>();
+
+    for (Application__c app : Trigger.new) {
+        candidateIds.add(app.Candidate__c);
+        jobIds.add(app.Job__c);
+    }
+
+    Map<Id, Candidate__c> candidates = new Map<Id, Candidate__c>(
+        [SELECT Id, Skills__c, Experience_Years__c FROM Candidate__c WHERE Id IN :candidateIds]
+    );
+    Map<Id, Job__c> jobs = new Map<Id, Job__c>(
+        [SELECT Id, Required_Skills__c, Job_Description__c FROM Job__c WHERE Id IN :jobIds]
+    );
+
+    for (Application__c app : Trigger.new) {
+        Candidate__c c = candidates.get(app.Candidate__c);
+        Job__c j = jobs.get(app.Job__c);
+
+        AICandidateMatcher.MatchRequest req = new AICandidateMatcher.MatchRequest();
+        req.candidateSkills = c.Skills__c;
+        req.candidateExperience = (Integer) c.Experience_Years__c;
+        req.jobRequiredSkills = j.Required_Skills__c;
+        req.jobDescription = j.Job_Description__c;
+
+        List<AICandidateMatcher.MatchResult> results = AICandidateMatcher.calculateScore(
+            new List<AICandidateMatcher.MatchRequest>{ req }
+        );
+
+        Application__c updateApp = new Application__c(Id = app.Id);
+        updateApp.AI_Recommendation__c = results[0].recommendation;
+        toUpdate.add(updateApp);
+    }
+
+    if (!toUpdate.isEmpty()) {
+        update toUpdate;
+    }
+}
+```
+
+---
+
+## Test Class — AICandidateMatcherTest.cls
+
+```apex
+@isTest
+public class AICandidateMatcherTest {
+
+    @isTest
+    static void testMatchScore() {
+        Test.setMock(HttpCalloutMock.class, new AgentforceMock());
+
+        AICandidateMatcher.MatchRequest req = new AICandidateMatcher.MatchRequest();
+        req.candidateSkills = 'Salesforce, Apex, LWC';
+        req.candidateExperience = 3;
+        req.jobRequiredSkills = 'Salesforce, Apex';
+
+        Test.startTest();
+        List<AICandidateMatcher.MatchResult> results = AICandidateMatcher.calculateScore(
+            new List<AICandidateMatcher.MatchRequest>{ req }
+        );
+        Test.stopTest();
+
+        System.assertEquals(85, results[0].matchScore);
+    }
+
+    private class AgentforceMock implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setStatusCode(200);
+            res.setBody('{\"match_score\":85,\"recommendation\":\"Strong match\"}');
+            return res;
+        }
+    }
+}
+```
+
+---
+
+## Setup Path
+**Setup → Einstein → Agentforce Studio → New Agent → Topic = Recruitment**
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/07-Agentforce-AI/AI-Configuration.md
