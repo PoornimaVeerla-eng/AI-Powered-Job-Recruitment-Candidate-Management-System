@@ -1,1 +1,139 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/03-Fields-and-Relationships/Fields-Schema.md --file-text "# Fields Schema
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/03-Fields-and-Relationships/Fields-Schema.md`
+
+---
+
+## Job__c Fields
+| Field Label | API Name | Type | Required |
+|-------------|----------|------|----------|
+| Job Title | `Job_Title__c` | Text(100) | Yes |
+| Department | `Department__c` | Picklist (Engineering, Sales, HR, Finance) | Yes |
+| Location | `Location__c` | Text(80) | No |
+| Job Description | `Job_Description__c` | Long Text Area(32768) | No |
+| Required Skills | `Required_Skills__c` | Long Text Area(5000) | No |
+| Min Salary | `Min_Salary__c` | Currency(10,2) | No |
+| Max Salary | `Max_Salary__c` | Currency(10,2) | No |
+| Status | `Status__c` | Picklist (Draft, Open, Closed) | Yes |
+| Posting Date | `Posting_Date__c` | Date | No |
+
+## Candidate__c Fields
+| Field Label | API Name | Type | Required |
+|-------------|----------|------|----------|
+| Email | `Email__c` | Email | Yes |
+| Phone | `Phone__c` | Phone | No |
+| Resume Link | `Resume_Link__c` | URL | No |
+| Skills | `Skills__c` | Long Text Area(5000) | No |
+| Experience (Years) | `Experience_Years__c` | Number(2,0) | No |
+| Current Company | `Current_Company__c` | Text(100) | No |
+| Expected Salary | `Expected_Salary__c` | Currency(10,2) | No |
+| AI Match Score | `AI_Match_Score__c` | Number(3,0) | No |
+
+## Application__c Fields (Junction)
+| Field Label | API Name | Type |
+|-------------|----------|------|
+| Job | `Job__c` | Master-Detail(Job__c) |
+| Candidate | `Candidate__c` | Master-Detail(Candidate__c) |
+| Application Status | `Application_Status__c` | Picklist (New, Screening, Shortlisted, Rejected, Hired) |
+| Applied Date | `Applied_Date__c` | Date |
+| AI Recommendation | `AI_Recommendation__c` | Long Text Area(5000) |
+
+## Interview__c Fields
+| Field Label | API Name | Type |
+|-------------|----------|------|
+| Application | `Application__c` | Master-Detail(Application__c) |
+| Interview Date | `Interview_Date__c` | DateTime |
+| Interviewer | `Interviewer__c` | Lookup(User) |
+| Round | `Round__c` | Picklist (HR, Technical, Managerial, Final) |
+| Feedback | `Feedback__c` | Long Text Area(5000) |
+| Result | `Result__c` | Picklist (Pass, Fail, On-Hold) |
+
+## Offer__c Fields
+| Field Label | API Name | Type |
+|-------------|----------|------|
+| Application | `Application__c` | Master-Detail(Application__c) |
+| Offered Salary | `Offered_Salary__c` | Currency(10,2) |
+| Joining Date | `Joining_Date__c` | Date |
+| Status | `Status__c` | Picklist (Pending, Approved, Rejected, Accepted) |
+| Approver Comments | `Approver_Comments__c` | Long Text Area(5000) |
+
+---
+
+## Sample Field Metadata XML
+
+### Job_Title__c.field-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomField xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Job_Title__c</fullName>
+    <label>Job Title</label>
+    <length>100</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
+```
+
+### Job__c on Application__c (Master-Detail)
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomField xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Job__c</fullName>
+    <label>Job</label>
+    <referenceTo>Job__c</referenceTo>
+    <relationshipLabel>Applications</relationshipLabel>
+    <relationshipName>Applications</relationshipName>
+    <type>MasterDetail</type>
+</CustomField>
+```
+
+### AI_Match_Score__c
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomField xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>AI_Match_Score__c</fullName>
+    <label>AI Match Score</label>
+    <precision>3</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>
+```
+
+### Department__c (Picklist)
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomField xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Department__c</fullName>
+    <label>Department</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Engineering</fullName><default>false</default></value>
+            <value><fullName>Sales</fullName><default>false</default></value>
+            <value><fullName>HR</fullName><default>false</default></value>
+            <value><fullName>Finance</fullName><default>false</default></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
+```
+
+---
+
+## Relationship Diagram (ERD)
+
+```
+Job__c (1) ──< Application__c >── (1) Candidate__c
+                     │
+                     ├──< Interview__c
+                     │
+                     └──< Offer__c
+```
+
+Where:
+- `Application__c` is a **junction object** with master-details to Job & Candidate
+- `Interview__c` and `Offer__c` are **child** of Application
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/03-Fields-and-Relationships/Fields-Schema.md
