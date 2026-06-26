@@ -1,1 +1,372 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/Deployment-Steps.md --file-text "# Deployment Steps
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/10-Deployment/Deployment-Steps.md`
+
+---
+
+## Deployment Strategy
+
+We use **Salesforce DX (SFDX) + Metadata API** with Git for version control.
+
+---
+
+## sfdx-project.json
+
+```json
+{
+    \"packageDirectories\": [
+        {
+            \"path\": \"force-app\",
+            \"default\": true
+        }
+    ],
+    \"name\": \"AI-Powered-Job-Recruitment\",
+    \"namespace\": \"\",
+    \"sfdcLoginUrl\": \"https://login.salesforce.com\",
+    \"sourceApiVersion\": \"59.0\"
+}
+```
+
+---
+
+## package.xml (Manifest)
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Package xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <types>
+        <members>Job__c</members>
+        <members>Candidate__c</members>
+        <members>Application__c</members>
+        <members>Interview__c</members>
+        <members>Offer__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>Offer_Approval_Process</members>
+        <name>ApprovalProcess</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>AICandidateMatcher</members>
+        <members>AgentforceService</members>
+        <members>AICandidateMatcherTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>ApplicationTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+    <types>
+        <members>candidateMatchCard</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>Recruitment_Hub</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Recruiter</members>
+        <members>HR_Manager</members>
+        <members>Interviewer</members>
+        <name>Profile</name>
+    </types>
+    <version>59.0</version>
+</Package>
+```
+
+---
+
+## Deployment Commands
+
+### Step 1 — Authorize Production Org
+```bash
+sfdx auth:web:login -a Prod -r https://login.salesforce.com
+```
+
+### Step 2 — Validate Deployment (Quick Deploy Check)
+```bash
+sfdx force:source:deploy -x manifest/package.xml -u Prod -l RunLocalTests -c
+```
+
+### Step 3 — Deploy to Production
+```bash
+sfdx force:source:deploy -x manifest/package.xml -u Prod -l RunLocalTests
+```
+
+### Step 4 — Run Apex Tests
+```bash
+sfdx force:apex:test:run -u Prod -c -r human -w 10
+```
+
+---
+
+## CI/CD — GitHub Actions
+
+### .github/workflows/sfdx-deploy.yml
+```yaml
+name: Salesforce Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+
+      - name: Authenticate to Salesforce
+        run: |
+          echo ${{ secrets.SFDX_AUTH_URL }} > authfile.txt
+          sf org login sfdx-url -f authfile.txt -a Prod
+
+      - name: Deploy Metadata
+        run: sf project deploy start -x manifest/package.xml -o Prod -l RunLocalTests
+
+      - name: Run Tests
+        run: sf apex run test -o Prod -c -r human -w 10
+```
+
+---
+
+## Pre-Deployment Checklist
+
+- [ ] All Apex tests pass with ≥ 75% code coverage
+- [ ] Validation rules tested in Sandbox
+- [ ] Approval process tested with sample data
+- [ ] Profiles & Permission Sets reviewed
+- [ ] Duplicate Rules tested
+- [ ] Email templates previewed
+- [ ] Agentforce agent activated in target org
+- [ ] Data backup created
+
+---
+
+## Post-Deployment Tasks
+
+1. Activate Approval Process in target org.
+2. Assign Permission Sets to users.
+3. Verify Agentforce agent status.
+4. Import seed data (sample Jobs & Candidates).
+5. Train end-users via documentation.
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/Documentation.md --file-text "# Documentation
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/10-Deployment/Documentation.md`
+
+---
+
+## End-User Documentation
+
+### 1. Logging In
+1. Visit `https://<your-org>.lightning.force.com`
+2. Enter username & password
+3. Switch to \"Recruitment Hub\" app from App Launcher
+
+---
+
+### 2. Creating a Job
+1. Click **Jobs** tab → **New**
+2. Fill in:
+   - Job Title
+   - Department
+   - Min/Max Salary
+   - Required Skills
+   - Job Description
+3. Set Status = `Open` → Save
+4. Note the auto-generated Job Number (e.g., `JOB-0001`)
+
+---
+
+### 3. Adding a Candidate
+1. Click **Candidates** tab → **New**
+2. Enter Name, Email, Phone, Skills, Experience
+3. Add Resume Link (Google Drive / SharePoint)
+4. Save — system auto-checks for duplicates
+
+---
+
+### 4. Creating an Application
+1. From the Candidate record → Related → **Applications** → New
+2. Select Job
+3. Set Status = `New`
+4. Save — **AI Match Score** auto-populates within seconds
+
+---
+
+### 5. Reviewing AI Match
+1. Open Application record
+2. View \"AI Match Analysis\" card (right panel)
+3. Green badge = Strong match (≥75)
+4. Click \"Re-run AI Analysis\" if needed
+
+---
+
+### 6. Scheduling Interview
+1. From Application → Related → **Interviews** → New
+2. Set Interview Date, Interviewer, Round
+3. Save — email auto-sent to candidate
+
+---
+
+### 7. Submitting Feedback
+1. Interviewer opens Interview record
+2. Fills Feedback + Result (Pass/Fail/On-Hold)
+3. If Pass → Application status auto-shortlisted
+
+---
+
+### 8. Creating & Approving Offer
+1. From Application → Related → **Offers** → New
+2. Enter Offered Salary, Joining Date
+3. Click \"Submit for Approval\"
+4. HR Manager receives email → Approves/Rejects
+5. Candidate notified automatically
+
+---
+
+## Admin Documentation
+
+### Maintaining Profiles
+- **Setup → Users → Profiles → [Edit]**
+
+### Editing Validation Rules
+- **Setup → Object Manager → [Object] → Validation Rules**
+
+### Managing Flows
+- **Setup → Process Automation → Flows**
+
+### Monitoring Agentforce
+- **Setup → Einstein → Agent Studio → Logs**
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| AI Score = 0 | Check Apex logs, Agentforce credentials |
+| Email not sent | Verify Email Deliverability (Setup → Deliverability) |
+| Approval not triggered | Check entry criteria, record status |
+| Duplicate not blocked | Confirm Matching Rule is Active |
+
+---
+
+## Training Resources
+
+- Video walkthroughs (10 mins each per role)
+- PDF user guide
+- In-app guidance via Salesforce Lightning Walkthroughs
+- Slack channel: `#recruitment-hub-support`
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/Documentation.md
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/UAT-Testing.md --file-text "# UAT Testing
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/10-Deployment/UAT-Testing.md`
+
+---
+
+## UAT Test Cases
+
+| # | Scenario | Steps | Expected Result | Status |
+|---|----------|-------|-----------------|--------|
+| 1 | Create new Job with valid data | Job tab → New → Fill all required → Save | Record saved, JOB-XXXX generated | ⬜ |
+| 2 | Create Job with Max < Min Salary | Job tab → New → Max=50000, Min=80000 | Validation error displayed | ⬜ |
+| 3 | Submit Candidate with duplicate email | Candidate → New → Use existing email | Blocked by duplicate rule | ⬜ |
+| 4 | Insert Application | Candidate → Related → Apps → New | AI score populated within 10s | ⬜ |
+| 5 | Interview marked Pass | Open Interview → Result=Pass → Save | Application auto-shortlisted | ⬜ |
+| 6 | Offer > 10L submitted | Create Offer with salary=15L → Submit | Approval process triggered | ⬜ |
+| 7 | HR Manager approves offer | Login as HR Manager → Approve | Status=Approved + email sent | ⬜ |
+| 8 | Recruiter tries to delete Job | Recruiter profile → Delete Job | Permission denied | ⬜ |
+| 9 | Interviewer accesses Offer | Interviewer profile → Offer tab | Tab hidden / Access denied | ⬜ |
+| 10 | Application status: Hired → New | Try changing back from Hired | Validation error | ⬜ |
+
+---
+
+## Performance Test Cases
+
+| # | Scenario | Expected |
+|---|----------|----------|
+| 11 | Bulk create 200 Applications | All AI scores generated, no governor limit hit |
+| 12 | Run dashboard report | Loads in < 3 seconds |
+| 13 | Search candidate by skill | Results in < 2 seconds |
+
+---
+
+## Security Test Cases
+
+| # | Scenario | Expected |
+|---|----------|----------|
+| 14 | Recruiter views another team's Candidates | Restricted (Private OWD) |
+| 15 | Interviewer modifies salary on Offer | Field-level security blocks |
+| 16 | Anonymous API access | Rejected |
+
+---
+
+## Sign-Off
+
+| Stakeholder | Role | Sign-Off Date | Signature |
+|-------------|------|---------------|-----------|
+| Project Manager | PM | ____ | ____ |
+| HR Manager | Business Owner | ____ | ____ |
+| IT Lead | Technical Owner | ____ | ____ |
+| Recruiter Lead | End User Rep | ____ | ____ |
+
+---
+
+## Defect Log
+
+| ID | Description | Severity | Status | Resolution |
+|----|-------------|----------|--------|------------|
+| D-001 | _Example: AI score returning null for empty skills_ | Medium | Fixed | Added null check in Apex |
+
+---
+
+## Go-Live Approval
+
+- [ ] All UAT test cases passed
+- [ ] No critical/high defects open
+- [ ] User training completed
+- [ ] Documentation handed over
+- [ ] Rollback plan documented
+- [ ] **Final Go-Live Approval:** ____________________
+
+---
+
+## Hypercare Support
+
+- **Duration:** 2 weeks post go-live
+- **Channel:** Slack + Email
+- **SLA:** 
+  - Critical: 2 hours
+  - High: 8 hours
+  - Medium: 24 hours
+  - Low: 3 business days
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/UAT-Testing.md
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/10-Deployment/Deployment-Steps.md
