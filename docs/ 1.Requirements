@@ -1,4 +1,4 @@
-"# 01 — Requirements & Scope
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/README.md --file-text "# 01 — Requirements & Scope
 
 GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/tree/main/01-Requirements`
 
@@ -51,8 +51,10 @@ The HR/Recruitment team needs a centralized Salesforce system to:
 - 80% accuracy in AI candidate matching
 - 100% offer approval traceability
 "
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/01-Requirements/README.md
 
-"# 02 — Objects Creation
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/README.md --file-text "# 02 — Objects Creation
 
 GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/tree/main/02-Objects`
 
@@ -178,3 +180,4 @@ GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Sale
 ## Setup Path (Salesforce UI)
 **Setup → Object Manager → Create → Custom Object**
 "
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/README.md
