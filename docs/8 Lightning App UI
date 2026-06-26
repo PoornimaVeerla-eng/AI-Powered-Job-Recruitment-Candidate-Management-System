@@ -1,1 +1,306 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Lightning-App.md --file-text "# Lightning App
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/08-Lightning-App-UI/Lightning-App.md`
+
+---
+
+## Lightning App — Recruitment Hub
+
+**Setup Path:** `Setup → App Manager → New Lightning App`
+
+### App Configuration
+| Setting | Value |
+|---------|-------|
+| App Name | Recruitment Hub |
+| Developer Name | `Recruitment_Hub` |
+| Description | AI-powered recruitment management |
+| Image | Recruitment icon |
+| Primary Color | #1B5E20 |
+| Navigation Style | Standard |
+| Form Factor | Desktop & Phone |
+
+### Tabs Added
+1. Home
+2. Jobs
+3. Candidates
+4. Applications
+5. Interviews
+6. Offers
+7. Reports
+8. Dashboards
+
+---
+
+## App Metadata XML — Recruitment_Hub.app-meta.xml
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomApplication xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <brand>
+        <headerColor>#1B5E20</headerColor>
+    </brand>
+    <description>AI-Powered Recruitment Management Platform</description>
+    <formFactors>Large</formFactors>
+    <formFactors>Small</formFactors>
+    <label>Recruitment Hub</label>
+    <navType>Standard</navType>
+    <tabs>standard-home</tabs>
+    <tabs>Job__c</tabs>
+    <tabs>Candidate__c</tabs>
+    <tabs>Application__c</tabs>
+    <tabs>Interview__c</tabs>
+    <tabs>Offer__c</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>standard-Dashboard</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>
+```
+
+---
+
+## Lightning Web Component — candidateMatchCard
+
+### candidateMatchCard.html
+```html
+<template>
+    <lightning-card title=\"AI Match Analysis\" icon-name=\"custom:custom63\">
+        <div class=\"slds-p-around_medium\">
+            <p><strong>Match Score:</strong> 
+                <lightning-badge label={matchScore} class={badgeVariant}></lightning-badge>
+            </p>
+            <p class=\"slds-m-top_small\"><strong>Recommendation:</strong></p>
+            <p>{recommendation}</p>
+            <lightning-button 
+                variant=\"brand\" 
+                label=\"Re-run AI Analysis\" 
+                onclick={runAnalysis}
+                class=\"slds-m-top_medium\">
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>
+```
+
+### candidateMatchCard.js
+```javascript
+import { LightningElement, api, wire } from 'lwc';
+import { getRecord } from 'lightning/uiRecordApi';
+import runAIMatch from '@salesforce/apex/AICandidateMatcher.calculateScore';
+
+const FIELDS = [
+    'Application__c.AI_Recommendation__c',
+    'Application__c.Candidate__r.AI_Match_Score__c'
+];
+
+export default class CandidateMatchCard extends LightningElement {
+    @api recordId;
+    matchScore = 0;
+    recommendation = '';
+
+    @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
+    wiredRecord({ data }) {
+        if (data) {
+            this.matchScore = data.fields.Candidate__r.value.fields.AI_Match_Score__c.value;
+            this.recommendation = data.fields.AI_Recommendation__c.value;
+        }
+    }
+
+    get badgeVariant() {
+        if (this.matchScore >= 75) return 'slds-theme_success';
+        if (this.matchScore >= 50) return 'slds-theme_warning';
+        return 'slds-theme_error';
+    }
+
+    runAnalysis() {
+        runAIMatch({ /* params */ })
+            .then(result => {
+                this.matchScore = result[0].matchScore;
+                this.recommendation = result[0].recommendation;
+            });
+    }
+}
+```
+
+### candidateMatchCard.js-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<LightningComponentBundle xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <apiVersion>59.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets=\"lightning__RecordPage\">
+            <objects>
+                <object>Application__c</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
+```
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Page-Layouts.md --file-text "# Page Layouts
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/08-Lightning-App-UI/Page-Layouts.md`
+
+---
+
+## Candidate Layout
+
+### Sections
+1. **Candidate Info** — Name, Email, Phone
+2. **Professional Details** — Skills, Experience, Current Company, Expected Salary
+3. **AI Insights** — AI Match Score (read-only), Resume Link
+4. **System Information** — Created/Modified
+
+### Metadata XML — Candidate__c-Candidate Layout.layout-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Layout xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <layoutSections>
+        <label>Candidate Info</label>
+        <columns>2</columns>
+        <layoutColumns>
+            <layoutItems><behavior>Required</behavior><field>Name</field></layoutItems>
+            <layoutItems><behavior>Required</behavior><field>Email__c</field></layoutItems>
+        </layoutColumns>
+        <layoutColumns>
+            <layoutItems><behavior>Edit</behavior><field>Phone__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Resume_Link__c</field></layoutItems>
+        </layoutColumns>
+    </layoutSections>
+    <layoutSections>
+        <label>Professional Details</label>
+        <columns>2</columns>
+        <layoutColumns>
+            <layoutItems><behavior>Edit</behavior><field>Skills__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Experience_Years__c</field></layoutItems>
+        </layoutColumns>
+        <layoutColumns>
+            <layoutItems><behavior>Edit</behavior><field>Current_Company__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Expected_Salary__c</field></layoutItems>
+        </layoutColumns>
+    </layoutSections>
+    <layoutSections>
+        <label>AI Insights</label>
+        <columns>1</columns>
+        <layoutColumns>
+            <layoutItems><behavior>Readonly</behavior><field>AI_Match_Score__c</field></layoutItems>
+        </layoutColumns>
+    </layoutSections>
+</Layout>
+```
+
+---
+
+## Job Layout
+
+### Sections
+1. **Job Details** — Title, Department, Location
+2. **Compensation** — Min Salary, Max Salary
+3. **Description** — Job Description, Required Skills
+4. **Status** — Status, Posting Date
+
+---
+
+## Application Layout
+
+### Sections
+1. **Application Info** — Job, Candidate, Status, Applied Date
+2. **AI Insights** — AI Recommendation (read-only)
+3. **Related Lists** — Interviews, Offers
+
+---
+
+## Setup Path
+**Setup → Object Manager → [Object] → Page Layouts → New**
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Page-Layouts.md
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Dynamic-Forms.md --file-text "# Dynamic Forms
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/08-Lightning-App-UI/Dynamic-Forms.md`
+
+---
+
+## Overview
+
+Dynamic Forms allow conditional rendering of fields on Lightning Record Pages based on field values, user profile, etc.
+
+---
+
+## Application Record Page — Dynamic Visibility Rules
+
+| Field | Visibility Condition |
+|-------|----------------------|
+| `AI_Recommendation__c` | Always |
+| `Rejection_Reason__c` | `Application_Status__c = 'Rejected'` |
+| `Offer_Date__c` | `Application_Status__c = 'Hired'` |
+| `Screening_Notes__c` | `Application_Status__c = 'Screening'` |
+| `Shortlist_Notes__c` | `Application_Status__c = 'Shortlisted'` |
+
+---
+
+## Setup Steps
+
+1. **Setup → App Builder → Application Record Page → Edit**
+2. Drag **Field Section** component from left panel.
+3. Click \"Upgrade Now\" to migrate from Layout to Dynamic Forms (if not already).
+4. For each field:
+   - Click on field → **Set Component Visibility**
+   - Add filter: `Record > Application_Status__c equals \"Rejected\"`
+
+---
+
+## Example Filter (Dynamic Forms)
+
+```
+Filter 1:
+  Field: Record.Application_Status__c
+  Operator: Equal
+  Value: Rejected
+```
+
+---
+
+## Job Record Page — Conditional Logic
+
+| Field | Visibility |
+|-------|------------|
+| `Posting_Date__c` | `Status__c = 'Open'` |
+| `Closure_Reason__c` | `Status__c = 'Closed'` |
+
+---
+
+## Offer Record Page — Conditional Logic
+
+| Field | Visibility |
+|-------|------------|
+| `Approver_Comments__c` | `Status__c IN ('Approved', 'Rejected')` |
+| `Joining_Date__c` | `Status__c = 'Accepted'` |
+
+---
+
+## Benefits
+
+- Cleaner UI — users see only relevant fields.
+- Reduced confusion during data entry.
+- No code required.
+- Faster page load (fewer fields rendered).
+
+---
+
+## Setup Path
+**Setup → Lightning App Builder → [Record Page] → Drag \"Field\" → Set Visibility**
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Dynamic-Forms.md
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/08-Lightning-App-UI/Lightning-App.md
