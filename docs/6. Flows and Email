@@ -1,1 +1,318 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Flows.md --file-text "# Flows
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/06-Flows-and-Email/Flows.md`
+
+---
+
+## Flow 1 — Auto-Update Application Status on Interview Pass
+
+**Type:** Record-Triggered Flow  
+**Object:** `Interview__c`  
+**Trigger:** After Update  
+**Condition:** `Result__c = 'Pass'`
+
+### Logic
+1. Get parent Application record.
+2. Update `Application__c.Application_Status__c = \"Shortlisted\"`.
+
+### Flow XML
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<Flow xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <apiVersion>59.0</apiVersion>
+    <label>Auto Shortlist on Interview Pass</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <object>Interview__c</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+        <filters>
+            <field>Result__c</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>Pass</stringValue></value>
+        </filters>
+        <connector><targetReference>Update_Application</targetReference></connector>
+    </start>
+    <recordUpdates>
+        <name>Update_Application</name>
+        <label>Update Application Status</label>
+        <inputAssignments>
+            <field>Application_Status__c</field>
+            <value><stringValue>Shortlisted</stringValue></value>
+        </inputAssignments>
+        <inputReference>$Record.Application__r</inputReference>
+    </recordUpdates>
+    <status>Active</status>
+</Flow>
+```
+
+---
+
+## Flow 2 — Send Welcome Email on Candidate Creation
+
+**Type:** Record-Triggered Flow  
+**Object:** `Candidate__c`  
+**Trigger:** After Insert
+
+### Logic
+- Send email using template `Welcome_Candidate_Template`.
+
+### Steps
+1. Get Record → Candidate
+2. Action → Send Email (template: Welcome_Candidate_Template)
+3. Recipient → `Candidate__c.Email__c`
+
+---
+
+## Flow 3 — Notify Recruiter on New Application
+
+**Type:** Record-Triggered Flow  
+**Object:** `Application__c`  
+**Trigger:** After Insert
+
+### Action
+- Email Alert: `New_Application_Alert` → sent to Job Owner.
+
+---
+
+## Flow 4 — Auto-Close Job When Filled
+
+**Type:** Record-Triggered Flow  
+**Object:** `Application__c`  
+**Trigger:** After Update  
+**Condition:** `Application_Status__c = 'Hired'`
+
+### Logic
+- Update parent Job__c → `Status__c = 'Closed'`
+
+---
+
+## Setup Path
+**Setup → Process Automation → Flows → New Flow → Record-Triggered Flow**
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Email-Templates.md --file-text "# Email Templates
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/06-Flows-and-Email/Email-Templates.md`
+
+---
+
+## 1. Welcome Candidate Template
+
+### Subject
+```
+Welcome to Our Talent Network, {!Candidate__c.Name}!
+```
+
+### Body
+```
+Hi {!Candidate__c.Name},
+
+Thank you for joining our talent network. We have received your profile and our recruiters will reach out as soon as a matching opportunity arises.
+
+Skills on record: {!Candidate__c.Skills__c}
+
+Best regards,
+Recruitment Team
+```
+
+### Metadata XML
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<EmailTemplate xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <available>true</available>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Welcome Candidate Template</name>
+    <subject>Welcome to Our Talent Network, {!Candidate__c.Name}!</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>
+```
+
+---
+
+## 2. Offer Approved Template
+
+### Subject
+```
+Congratulations! Your Offer has been Approved
+```
+
+### Body
+```
+Dear {!Offer__c.Application__r.Candidate__r.Name},
+
+Congratulations! Your offer for the position of {!Offer__c.Application__r.Job__r.Job_Title__c} has been approved.
+
+Offered Salary: {!Offer__c.Offered_Salary__c}
+Joining Date: {!Offer__c.Joining_Date__c}
+
+We look forward to having you on the team!
+
+Best regards,
+HR Team
+```
+
+---
+
+## 3. Interview Scheduled Template
+
+### Subject
+```
+Interview Scheduled — {!Interview__c.Round__c} Round
+```
+
+### Body
+```
+Hi {!Interview__c.Application__r.Candidate__r.Name},
+
+Your {!Interview__c.Round__c} interview has been scheduled on {!Interview__c.Interview_Date__c}.
+
+Interviewer: {!Interview__c.Interviewer__r.Name}
+
+All the best!
+Recruitment Team
+```
+
+---
+
+## 4. Application Rejected Template
+
+### Subject
+```
+Update on Your Application — {!Application__c.Job__r.Job_Title__c}
+```
+
+### Body
+```
+Dear {!Application__c.Candidate__r.Name},
+
+Thank you for your interest in the {!Application__c.Job__r.Job_Title__c} position.
+
+After careful consideration, we have decided to move forward with other candidates whose profiles more closely match the current requirements.
+
+We will keep your profile on file for future opportunities.
+
+Best regards,
+Recruitment Team
+```
+
+---
+
+## 5. New Application Notification (Internal)
+
+### Subject
+```
+New Application Received — {!Application__c.Job__r.Job_Title__c}
+```
+
+### Body
+```
+Hi {!Application__c.Job__r.OwnerFullName},
+
+A new application has been received:
+
+Candidate: {!Application__c.Candidate__r.Name}
+Job: {!Application__c.Job__r.Job_Title__c}
+AI Match Score: {!Application__c.Candidate__r.AI_Match_Score__c}
+
+Please review at your earliest convenience.
+
+Thanks,
+Recruitment System
+```
+
+---
+
+## Setup Path
+**Setup → Email → Classic Email Templates → New Template**
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Email-Templates.md
+
+
+
+
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Email-Alerts.md --file-text "# Email Alerts
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/06-Flows-and-Email/Email-Alerts.md`
+
+---
+
+## Email Alerts Configuration
+
+| Alert | Object | Template | Recipients | Trigger |
+|-------|--------|----------|------------|---------|
+| `New_Application_Alert` | Application__c | New_Application_Template | Job Owner | On Insert |
+| `Offer_Approved_Alert` | Offer__c | Offer_Approved_Template | Candidate, Recruiter | On Approval |
+| `Offer_Rejected_Alert` | Offer__c | Offer_Rejected_Template | Recruiter | On Rejection |
+| `Interview_Scheduled_Alert` | Interview__c | Interview_Scheduled_Template | Candidate | On Insert |
+| `Application_Rejected_Alert` | Application__c | Application_Rejected_Template | Candidate | On Status Change to Rejected |
+
+---
+
+## Email Alert Metadata XML
+
+### New_Application_Alert.alert-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<WorkflowAlert xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>New_Application_Alert</fullName>
+    <description>Notify recruiter of new application</description>
+    <protected>false</protected>
+    <recipients>
+        <type>owner</type>
+    </recipients>
+    <senderType>CurrentUser</senderType>
+    <template>unfiled$public/New_Application_Template</template>
+</WorkflowAlert>
+```
+
+### Offer_Approved_Alert.alert-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<WorkflowAlert xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Offer_Approved_Alert</fullName>
+    <description>Notify candidate and recruiter that offer is approved</description>
+    <protected>false</protected>
+    <ccEmails>recruiter@company.com</ccEmails>
+    <recipients>
+        <type>email</type>
+        <field>Application__r.Candidate__r.Email__c</field>
+    </recipients>
+    <senderType>DefaultWorkflowUser</senderType>
+    <template>unfiled$public/Offer_Approved_Template</template>
+</WorkflowAlert>
+```
+
+### Interview_Scheduled_Alert.alert-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<WorkflowAlert xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <fullName>Interview_Scheduled_Alert</fullName>
+    <protected>false</protected>
+    <recipients>
+        <type>email</type>
+        <field>Application__r.Candidate__r.Email__c</field>
+    </recipients>
+    <senderType>CurrentUser</senderType>
+    <template>unfiled$public/Interview_Scheduled_Template</template>
+</WorkflowAlert>
+```
+
+---
+
+## Setup Path
+**Setup → Process Automation → Email Alerts → New Email Alert**
+
+For each alert:
+1. Choose object.
+2. Select email template.
+3. Add recipients (User, Email Field, Role, Group, Public Group).
+4. Set From Address (defaults to Current User or Org-wide).
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Email-Alerts.md
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/06-Flows-and-Email/Flows.md
