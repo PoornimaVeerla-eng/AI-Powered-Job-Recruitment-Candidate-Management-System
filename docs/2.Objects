@@ -1,1 +1,117 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/Objects-List.md --file-text "# Objects List
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/02-Objects/Objects-List.md`
+
+---
+
+## Custom Objects Summary
+
+| # | Object | API Name | Record Name | Format |
+|---|--------|----------|-------------|--------|
+| 1 | Job | `Job__c` | Job Number | Auto Number `JOB-{0000}` |
+| 2 | Candidate | `Candidate__c` | Candidate Name | Text |
+| 3 | Application | `Application__c` | Application Number | Auto Number `APP-{0000}` |
+| 4 | Interview | `Interview__c` | Interview Number | Auto Number `INT-{0000}` |
+| 5 | Offer | `Offer__c` | Offer Number | Auto Number `OFF-{0000}` |
+
+---
+
+## Object Metadata XML
+
+### Job__c.object-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <label>Job</label>
+    <pluralLabel>Jobs</pluralLabel>
+    <nameField>
+        <displayFormat>JOB-{0000}</displayFormat>
+        <label>Job Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+    <enableActivities>true</enableActivities>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+</CustomObject>
+```
+
+### Candidate__c.object-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <label>Candidate</label>
+    <pluralLabel>Candidates</pluralLabel>
+    <nameField>
+        <label>Candidate Name</label>
+        <type>Text</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+    <enableActivities>true</enableActivities>
+    <enableReports>true</enableReports>
+</CustomObject>
+```
+
+### Application__c.object-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <label>Application</label>
+    <pluralLabel>Applications</pluralLabel>
+    <nameField>
+        <displayFormat>APP-{0000}</displayFormat>
+        <label>Application Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
+```
+
+### Interview__c.object-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <label>Interview</label>
+    <pluralLabel>Interviews</pluralLabel>
+    <nameField>
+        <displayFormat>INT-{0000}</displayFormat>
+        <label>Interview Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
+```
+
+### Offer__c.object-meta.xml
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<CustomObject xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <label>Offer</label>
+    <pluralLabel>Offers</pluralLabel>
+    <nameField>
+        <displayFormat>OFF-{0000}</displayFormat>
+        <label>Offer Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>
+```
+
+---
+
+## Setup Path (Salesforce UI)
+**Setup → Object Manager → Create → Custom Object**
+
+For each object:
+1. Define label, plural label, API name.
+2. Choose record name type (Text / Auto Number).
+3. Enable Reports, Activities, Search, Field History Tracking.
+4. Set sharing model.
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/02-Objects/Objects-List.md
