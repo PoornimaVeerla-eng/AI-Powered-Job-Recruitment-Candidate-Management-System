@@ -13,7 +13,6 @@
 ## 📖 About the Project
 
 This project automates the recruitment lifecycle using AI and NLP. It parses resumes, extracts key candidate info, ranks candidates against job descriptions using semantic similarity, and provides a clean dashboard for recruiters.
-
 Built end-to-end across **5 phases** — Requirements, Backend, UI/UX, Data & Testing, and Deployment.
 
 ---
