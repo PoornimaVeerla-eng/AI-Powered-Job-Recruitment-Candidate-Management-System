@@ -1,1 +1,119 @@
 
+Action: file_editor create /app/AI-Powered-Job-Recruitment-Salesforce/05-Approval-Process/Approval-Process.md --file-text "# Approval Process
+
+GitHub Link: `https://github.com/<your-username>/AI-Powered-Job-Recruitment-Salesforce/blob/main/05-Approval-Process/Approval-Process.md`
+
+---
+
+## Approval Process — Offer Letter Approval
+
+**Object:** `Offer__c`  
+**Purpose:** Any offer with salary above ₹10,00,000 (or $50,000) requires HR Manager approval.
+
+---
+
+## Entry Criteria
+
+```
+AND(
+    ISPICKVAL(Status__c, \"Pending\"),
+    Offered_Salary__c > 1000000
+)
+```
+
+---
+
+## Approval Steps
+
+### Step 1 — HR Manager Approval
+- **Assigned Approver:** Manager of record owner (or named user: `hr.manager@company.com`)
+- **Approval Action:** Field Update → Status = \"Approved\"
+- **Rejection Action:** Field Update → Status = \"Rejected\"
+
+---
+
+## Initial Submission Actions
+1. **Field Update:** Lock record for editing.
+2. **Email Alert:** Send approval request to HR Manager.
+
+## Final Approval Actions
+1. **Field Update:** `Status__c = \"Approved\"`
+2. **Email Alert:** Notify Recruiter & Candidate.
+
+## Final Rejection Actions
+1. **Field Update:** `Status__c = \"Rejected\"`
+2. **Email Alert:** Notify Recruiter with reason.
+
+---
+
+## Metadata XML — Offer_Approval_Process.approvalProcess-meta.xml
+
+```xml
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<ApprovalProcess xmlns=\"http://soap.sforce.com/2006/04/metadata\">
+    <active>true</active>
+    <allowRecall>true</allowRecall>
+    <approvalStep>
+        <allowDelegate>false</allowDelegate>
+        <assignedApprover>
+            <approver>
+                <type>userHierarchyField</type>
+                <name>Manager</name>
+            </approver>
+            <whenMultipleApprovers>FirstResponse</whenMultipleApprovers>
+        </assignedApprover>
+        <label>HR Manager Approval</label>
+        <name>HR_Manager_Approval</name>
+    </approvalStep>
+    <entryCriteria>
+        <booleanFilter>1 AND 2</booleanFilter>
+        <criteriaItems>
+            <field>Offer__c.Status__c</field>
+            <operation>equals</operation>
+            <value>Pending</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Offer__c.Offered_Salary__c</field>
+            <operation>greaterThan</operation>
+            <value>1000000</value>
+        </criteriaItems>
+    </entryCriteria>
+    <finalApprovalActions>
+        <action>
+            <name>Set_Status_Approved</name>
+            <type>FieldUpdate</type>
+        </action>
+        <action>
+            <name>Email_Offer_Approved</name>
+            <type>Alert</type>
+        </action>
+    </finalApprovalActions>
+    <finalRejectionActions>
+        <action>
+            <name>Set_Status_Rejected</name>
+            <type>FieldUpdate</type>
+        </action>
+    </finalRejectionActions>
+    <label>Offer Approval Process</label>
+    <recordEditability>AdminOnly</recordEditability>
+</ApprovalProcess>
+```
+
+---
+
+## Setup Path
+**Setup → Process Automation → Approval Processes → New Approval Process → Use Jump Start Wizard → Object = Offer**
+
+---
+
+## Test Scenarios
+
+| # | Action | Expected |
+|---|--------|----------|
+| 1 | Create Offer with salary < 1L | No approval triggered |
+| 2 | Create Offer with salary > 10L | Approval triggered, record locked |
+| 3 | HR Manager approves | Status = Approved, email sent |
+| 4 | HR Manager rejects | Status = Rejected, email sent |
+| 5 | Recall pending offer | Returns to draft |
+"
+Observation: Create successful: /app/AI-Powered-Job-Recruitment-Salesforce/05-Approval-Process/Approval-Process.md
