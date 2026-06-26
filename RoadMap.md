@@ -1,6 +1,6 @@
 | # | Milestone | Folder | GitHub Link |
 |---|-----------|--------|-------------|
-| 1 | Requirements & Scope | [01-Requirements] | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/01-Requirements` |
+| 1 | Requirements & Scope | [01-Requirements](./01-Requirements) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/01-Requirements` |
 | 2 | Objects Creation | [02-Objects](./02-Objects) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/02-Objects` |
 | 3 | Fields & Relationships | [03-Fields-and-Relationships](./03-Fields-and-Relationships) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/03-Fields-and-Relationships` |
 | 4 | Validation Rules | [04-Validation-Rules](./04-Validation-Rules) | `https://github.com/@PoornimaVeerla-eng/AI-Powered-Job-Recruitment-Salesforce/tree/main/04-Validation-Rules` |
