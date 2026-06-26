@@ -74,45 +74,19 @@ Open browser → `http://localhost:8000`
 ai-recruitment-system/
 │
 ├── README.md
+|
+├──RoadMap.md
 │
-├── 01-Requirements/
-│   ├── Business-Requirements.md
-│   └── Project-Scope.md
-│
-├── 02-Objects/
-│   └── Objects-List.md
-│
-├── 03-Fields-and-Relationships/
-│   └── Fields-Schema.md
-│
-├── 04-Validation-Rules/
-│   └── Validation-Rules.md
-│
-├── 05-Approval-Process/
-│   └── Approval-Process.md
-│
-├── 06-Flows-and-Email/
-│   ├── Flows.md
-│   ├── Email-Templates.md
-│   └── Email-Alerts.md
-│
-├── 07-Agentforce-AI/
-│   └── AI-Configuration.md
-│
-├── 08-Lightning-App-UI/
-│   ├── Lightning-App.md
-│   ├── Page-Layouts.md
-│   └── Dynamic-Forms.md
-│
-├── 09-Security/
-│   ├── Profiles.md
-│   ├── Roles-Hierarchy.md
-│   └── Duplicate-Rules.md
-│
-└── 10-Deployment/
-    ├── Deployment-Steps.md
-    ├── Documentation.md
-    └── UAT-Testing.md
+├── docs ── 01-Requirements
+         ── 02-Objects
+         ── 03-Fields-and-Relationships
+         ── 04-Validation-Rules
+         ── 05-Approval-Process
+         ── 06-Flows-and-Email
+         ── 07-Agentforce-AI
+         ── 08-Lightning-App-UI
+         ── 09-Security
+         ── 10-Deployment
 ```
 
 ---
