@@ -73,18 +73,47 @@ Open browser → `http://localhost:8000`
 
 ```
 ai-recruitment-system/
+│
 ├── README.md
-├── ROADMAP.md
-├── CODE_LINKS.md
-├── LICENSE
-├── .gitignore
-├── src/                   # Backend code
-├── frontend/              # UI files
-├── docs/                  # Phase documentation
-├── data/                  # Sample data
-├── tests/                 # Unit tests
-├── deployment/            # Docker configs
-└── assets/                # Logo & images
+│
+├── 01-Requirements/
+│   ├── Business-Requirements.md
+│   └── Project-Scope.md
+│
+├── 02-Objects/
+│   └── Objects-List.md
+│
+├── 03-Fields-and-Relationships/
+│   └── Fields-Schema.md
+│
+├── 04-Validation-Rules/
+│   └── Validation-Rules.md
+│
+├── 05-Approval-Process/
+│   └── Approval-Process.md
+│
+├── 06-Flows-and-Email/
+│   ├── Flows.md
+│   ├── Email-Templates.md
+│   └── Email-Alerts.md
+│
+├── 07-Agentforce-AI/
+│   └── AI-Configuration.md
+│
+├── 08-Lightning-App-UI/
+│   ├── Lightning-App.md
+│   ├── Page-Layouts.md
+│   └── Dynamic-Forms.md
+│
+├── 09-Security/
+│   ├── Profiles.md
+│   ├── Roles-Hierarchy.md
+│   └── Duplicate-Rules.md
+│
+└── 10-Deployment/
+    ├── Deployment-Steps.md
+    ├── Documentation.md
+    └── UAT-Testing.md
 ```
 
 ---
